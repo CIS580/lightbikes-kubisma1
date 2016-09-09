@@ -1,9 +1,18 @@
 var canvas = document.getElementById('screen');
 var ctx = canvas.getContext('2d');
-var speed = 1/16/1000;
 
+var backCanvas = document.createElement('canvas');
+backCanvas.widht = canvas.width;
+backCanvas.height = canvas.height;
+var backCtx = backCanvas.getContext('2d');
+
+var speed = 1/16/1000;
 var x = 0;
 var y = 0;
+
+var image = new Image();
+// TODO
+image.src = "file:///home/kubisma1/Downloads/landscape.jpg"
 
 // Object input
 var input = {
@@ -76,13 +85,40 @@ window.onkeyup = function(event){
   }
 }
 
-function loop(){
+function loop(timestamp){
     if(input.up) y -= 1;
     if(input.down) y += 1;
     if(input.left) x -= 1;
     if(input.right) x += 1;
-    ctx.fillStyle = "red";
-    ctx.fillRect(x, y, 5, 5);
-    setTimeout(loop, speed);
+
+    backCtx.clearRect(0, 0, canvas.width, canvas.height);
+    // TODO
+    backCtx.drawImage(image, 0, 0, backCanvas.width, backCanvas.height);
+
+    for (var i = 0; i < 100; i++) {
+      backCtx.fillStyle = "blue";
+      backCtx.fillRect(
+        (i * 20) % 100,
+        (i * 20) % 100,
+        10,
+        10
+      );
+    }
+
+    backCtx.fillStyle = "red";
+    backCtx.fillRect(x, y, 5, 5);
+
+    // Swap buffers
+    ctx.drawImage(backCanvas, 0, 0);
+
+    //setTimeout(loop, speed); // One time event in miliseconds
+    requestAnimationFrame(loop);
 }
-loop();
+
+// Equiv to setTimeout, has a return value (an object)
+//var intervalId = setInterval(loop, speed);
+
+// Other option with frame synchronization
+requestAnimationFrame(loop);
+
+//loop();
